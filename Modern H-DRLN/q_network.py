@@ -41,3 +41,13 @@ class QNetwork(nn.Module):
         act_hidden2 = self.act_hidden2(y_hidden2)
 
         return torch.add(torch.matmul(act_hidden1, self.W_output), self.b_output)
+
+    def predict(self, x):
+        y = self.forward(x)
+        return torch.argmax(y, 1)
+
+    def loss(self, x, nextQ):
+        y = self.predict(x)
+        return torch.sum(torch.square(nextQ - y))
+
+    def loss(self, x):

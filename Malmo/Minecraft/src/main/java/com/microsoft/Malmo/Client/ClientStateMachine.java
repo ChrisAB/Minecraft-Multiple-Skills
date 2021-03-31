@@ -1158,8 +1158,10 @@ public class ClientStateMachine extends StateMachine implements IMalmoMessageLis
                 {
                     // The name of our agent no longer matches the agent in our game profile -
                     // safest way to update is to log out and back in again.
-                    Minecraft.getMinecraft().world.sendQuittingDisconnectingPacket();
-                    Minecraft.getMinecraft().loadWorld((WorldClient)null);
+                    // This hangs so just warn instead about the miss-match and proceed.
+                    TCPUtils.Log(Level.WARNING,"Agent name does not match agent in game.");
+                    // Minecraft.getMinecraft().world.sendQuittingDisconnectingPacket();
+                    // Minecraft.getMinecraft().loadWorld((WorldClient)null);
                 }
                 if (Minecraft.getMinecraft().getCurrentServerData() == null || !Minecraft.getMinecraft().getCurrentServerData().serverIP.equals(targetIP))
                 {
@@ -1597,6 +1599,12 @@ public class ClientStateMachine extends StateMachine implements IMalmoMessageLis
                 Minecraft.getMinecraft().loadWorld((WorldClient) null);
                 // Must display the GUI or Minecraft will attempt to access a non-existent player in the client tick.
                 Minecraft.getMinecraft().displayGuiScreen(new GuiMainMenu());
+
+                // Allow shutdown messages to flow through.
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException ie) {
+                }
             }
         }
 

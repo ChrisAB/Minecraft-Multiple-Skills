@@ -65,6 +65,7 @@ public class MalmoEnvServer implements IWantToQuit {
 
         // Actions (with optional turn key)
         String turnKey = "";
+        String lastTurnKey = "";
         LinkedList<String> commands = new LinkedList<String>();
     }
 
@@ -314,6 +315,7 @@ public class MalmoEnvServer implements IWantToQuit {
         envState.done = false;
         envState.quit = false;
         envState.turnKey = "";
+        envState.lastTurnKey = "";
         envState.token = myToken;
         envState.experimentId = experimentId;
         envState.agentCount = agentCount;
@@ -340,9 +342,13 @@ public class MalmoEnvServer implements IWantToQuit {
         byte[] replyBytes = new byte[hdr];
         dis.readFully(replyBytes);
 
-        if (new String(replyBytes).equals("MALMOOK")) {
+        String replyStr = new String(replyBytes);
+        if (replyStr.equals("MALMOOK")) {
             TCPUtils.Log(Level.INFO, "MalmoEnvServer Mission starting ...");
             return true;
+        } else if (replyStr.equals("MALMOBUSY")) {
+            TCPUtils.Log(Level.INFO, "MalmoEnvServer Busy - I want to quit");
+            this.envState.quit = true;
         }
         return false;
     }
@@ -421,6 +427,8 @@ public class MalmoEnvServer implements IWantToQuit {
                             // The step turn key may later still be stale when picked up from the command queue.
                             envState.commands.add(new String(stepTurnKey) + " " + actions);
                             outOfTurn = false;
+                            envState.turnKey = "";
+                            envState.lastTurnKey = new String(stepTurnKey);
                             sent = true;
                         }
                     }
@@ -665,6 +673,7 @@ public class MalmoEnvServer implements IWantToQuit {
             envState.quit = false;
             envState.missionInit = null;
             envState.turnKey = "";
+            envState.lastTurnKey = "";
 
             if (envState.token != null) {
                 initTokens.remove(envState.token);
@@ -696,7 +705,9 @@ public class MalmoEnvServer implements IWantToQuit {
             if (!envState.turnKey.equals(turnKey)) {
                 // TCPUtils.Log(Level.FINE,"Update TK: [" + turnKey + "][" + turnKey + "]");
             }
-            envState.turnKey = turnKey;
+            if (!envState.lastTurnKey.equals(turnKey)) {
+                envState.turnKey = turnKey;
+            }
             envState.info = info;
             cond.signalAll();
         } finally {
