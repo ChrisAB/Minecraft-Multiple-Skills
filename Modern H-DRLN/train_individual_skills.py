@@ -20,7 +20,7 @@ class SkillTrainer:
         self.target_net = DQN(number_of_actions=self.n_actions).to(self.device)
         self.target_net.load_state_dict(self.policy_net.state_dict())
         self.target_net.eval()
-        self.optimizer = optim.RMSprop(self.policy_net.parameters())
+        self.optimizer = torch.optim.RMSprop(self.policy_net.parameters())
         self.memory = ReplayMemory(10000)
         self.grayscaler = torchvision.transforms.Grayscale()
 
