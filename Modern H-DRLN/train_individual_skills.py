@@ -44,7 +44,7 @@ class SkillTrainer:
                       role=self.args.role,
                       exp_uid=self.args.experimentUniqueId,
                       episode=self.args.episode, resync=self.args.resync)
-        self.n_actions = env.action_space.__len__()
+        self.n_actions = self.env.action_space.__len__()
 
     def select_action(self, state):
         sample = random.random()
