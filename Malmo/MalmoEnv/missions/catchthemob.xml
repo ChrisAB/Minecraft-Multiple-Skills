@@ -34,7 +34,7 @@
         <!-- coordinates for cuboid are inclusive -->
         <DrawCuboid type="air" x1="-24" x2="24" y1="4" y2="40" z1="-20" z2="20"/>
 
-		<!-- Draw world -->
+        <!-- Draw world -->
         <DrawBlock type="spruce_fence" x="0" y="4" z="4"/>
         <DrawBlock type="clay" x="0" y="3" z="4"/>
         <DrawBlock type="spruce_fence" x="0" y="4" z="5"/>
@@ -131,9 +131,9 @@
     </AgentStart>
     <AgentHandlers>
       <DiscreteMovementCommands>
-          <ModifierList type="deny-list">
-            <command>attack</command>
-          </ModifierList>
+        <ModifierList type="deny-list">
+          <command>attack</command>
+        </ModifierList>
       </DiscreteMovementCommands>
       <MissionQuitCommands/>
       <ObservationFromNearbyEntities>
@@ -155,8 +155,8 @@
         <Block description="Agent0_defaulted" type="brick_block"/>
       </AgentQuitFromTouchingBlockType>
       <VideoProducer want_depth="false">
-        <Width>640</Width>
-        <Height>480</Height>
+        <Width>84</Width>
+        <Height>84</Height>
       </VideoProducer>
     </AgentHandlers>
   </AgentSection>
