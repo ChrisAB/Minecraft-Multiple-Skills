@@ -4,6 +4,8 @@ from pathlib import Path
 import time
 import torch
 import torchvision
+import matplotlib
+import matplotlib.pyplot as plt
 from PIL import Image
 from dqn import DQN
 from replay_memory import Transition, ReplayMemory
@@ -128,6 +130,7 @@ class SkillTrainer:
     def plot_durations(self):
         plt.figure(2)
         plt.clf()
+        print(self.episode_durations)
         durations_t = torch.tensor(self.episode_durations, dtype=torch.float)
         plt.title('Training...')
         plt.xlabel('Episode')
@@ -141,9 +144,7 @@ class SkillTrainer:
 
         plt.pause(0.001)  # pause a bit so that plots are updated
         plt.savefig(self.args.plot_image_location)
-        if is_ipython:
-            display.clear_output(wait=True)
-            display.display(plt.gcf())
+        plt.show()
 
     def start(self):
         print("Starting...")
