@@ -7,6 +7,11 @@ import torchvision
 from PIL import Image
 from dqn import DQN
 from replay_memory import Transition, ReplayMemory
+from itertools import count
+import random
+import math
+import re
+import numpy as np
 
 
 class SkillTrainer:
@@ -57,14 +62,14 @@ class SkillTrainer:
                 # second column on max result is index of where max element was
                 # found, so we pick action with the larger expected reward.
                 action = self.policy_net(state).max(1)[1].view(1, 1)
-                print(action)
-                action = self.env.action_state.__getitem(action)
-                action = int(action)
-                return action
+                action = action.item()
+                action = self.env.action_space.__getitem__(action)
+                action = int(re.search(r'\d+', action).group())
+                return torch.tensor([[action]], device=self.device, dtype=torch.long)
         else:
-            return torch.tensor([[self.env.action_state.sample()]], device=self.device, dtype=torch.long)
+            return torch.tensor([[self.env.action_space.sample()]], device=self.device, dtype=torch.long)
 
-    def optimize_model():
+    def optimize_model(self):
         if len(self.memory) < self.BATCH_SIZE:
             return
         transitions = self.memory.sample(self.BATCH_SIZE)
@@ -72,13 +77,13 @@ class SkillTrainer:
         # detailed explanation). This converts batch-array of Transitions
         # to Transition of batch-arrays.
         batch = Transition(*zip(*transitions))
-
         # Compute a mask of non-final states and concatenate the batch elements
         # (a final state would've been the one after which simulation ended)
         non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
                                                 batch.next_state)), device=self.device, dtype=torch.bool)
         non_final_next_states = torch.cat([s for s in batch.next_state
                                            if s is not None])
+
         state_batch = torch.cat(batch.state)
         action_batch = torch.cat(batch.action)
         reward_batch = torch.cat(batch.reward)
@@ -113,23 +118,29 @@ class SkillTrainer:
         self.optimizer.step()
 
     def preprocess_image(self, obs):
-        obs = obs.reshape(3, 84, 84)
+        obs = obs.reshape(84, 84, 3)
+        np.flipud(obs)
         obs = torchvision.transforms.functional.to_tensor(obs)
-        obs = grayscaler(obs)
+        obs = self.grayscaler(obs)
         obs = obs.reshape(1, 1, 84, 84)
-        return obs
+        return obs.to(self.device)
 
     def start(self):
+        print("Starting...")
         num_episodes = self.args.episodes
         for i_episode in range(num_episodes):
+            print("Starting episode " + str(i_episode))
             # Initialize the environment and state
             obs = self.env.reset()
+            print(obs)
+            print("Env was reset")
             state = self.preprocess_image(obs)
+            print("Image was preprocessed")
             for t in count():
                 # Select and perform an action
-                print(state.shape)
                 action = self.select_action(state)
-                obs, reward, done, _ = self.env.step(action)
+                obs, reward, done, info = self.env.step(action)
+                print(info)
                 reward = torch.tensor([reward], device=self.device)
 
                 # Observe new state
@@ -139,7 +150,7 @@ class SkillTrainer:
                     next_state = None
 
                 # Store the transition in memory
-                memory.push(state, action, next_state, reward)
+                self.memory.push(state, action, next_state, reward)
 
                 # Move to the next state
                 state = next_state
@@ -150,13 +161,20 @@ class SkillTrainer:
                     self.episode_durations.append(t + 1)
                     break
                 if self.args.saveimagesteps > 0 and t % self.args.saveimagesteps == 0:
-                    h, w, d = self.env.observation_space.shape
-                    img = Image.fromarray(obs.reshape(h, w, d))
-                    img.save('image' + str(args.role) + '_' + str(t) + '.png')
-
+                    print('Saved image ' + str(i_episode) +
+                          '_' + str(t) + '.png')
+                    img_obs = obs.copy()
+                    img_obs = img_obs.reshape(84, 84, 3)
+                    img_obs = np.flipud(img_obs)
+                    img = Image.fromarray(img_obs)
+                    img.save('tmp_images/image' +
+                             str(i_episode) + '_' + str(t) + '.png')
+            print("Finished episode")
             # Update the target network, copying all weights and biases in DQN
             if i_episode % self.TARGET_UPDATE == 0:
+                print("Updating target at episode " + str(i_episode))
                 self.target_net.load_state_dict(self.policy_net.state_dict())
+            time.sleep(5)
 
         print('Complete')
         self.env.render()
@@ -194,4 +212,5 @@ if __name__ == '__main__':
     if args.server2 is None:
         args.server2 = args.server
 
-    SkillTrainer(args)
+    trainer = SkillTrainer(args)
+    trainer.start()
