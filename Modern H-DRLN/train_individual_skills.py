@@ -125,6 +125,26 @@ class SkillTrainer:
         obs = obs.reshape(1, 1, 84, 84)
         return obs.to(self.device)
 
+    def plot_durations(self):
+        plt.figure(2)
+        plt.clf()
+        durations_t = torch.tensor(self.episode_durations, dtype=torch.float)
+        plt.title('Training...')
+        plt.xlabel('Episode')
+        plt.ylabel('Duration')
+        plt.plot(durations_t.numpy())
+        # Take 100 episode averages and plot them too
+        if len(durations_t) >= 100:
+            means = durations_t.unfold(0, 100, 1).mean(1).view(-1)
+            means = torch.cat((torch.zeros(99), means))
+            plt.plot(means.numpy())
+
+        plt.pause(0.001)  # pause a bit so that plots are updated
+        plt.savefig(self.args.plot_image_location)
+        if is_ipython:
+            display.clear_output(wait=True)
+            display.display(plt.gcf())
+
     def start(self):
         print("Starting...")
         num_episodes = self.args.episodes
@@ -132,7 +152,6 @@ class SkillTrainer:
             print("Starting episode " + str(i_episode))
             # Initialize the environment and state
             obs = self.env.reset()
-            print(obs)
             print("Env was reset")
             state = self.preprocess_image(obs)
             print("Image was preprocessed")
@@ -140,7 +159,6 @@ class SkillTrainer:
                 # Select and perform an action
                 action = self.select_action(state)
                 obs, reward, done, info = self.env.step(action)
-                print(info)
                 reward = torch.tensor([reward], device=self.device)
 
                 # Observe new state
@@ -174,6 +192,7 @@ class SkillTrainer:
             if i_episode % self.TARGET_UPDATE == 0:
                 print("Updating target at episode " + str(i_episode))
                 self.target_net.load_state_dict(self.policy_net.state_dict())
+                self.plot_durations()
             time.sleep(5)
 
         print('Complete')
@@ -211,6 +230,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     if args.server2 is None:
         args.server2 = args.server
-
+    args.plot_image_location = '/content/plot.png'
     trainer = SkillTrainer(args)
     trainer.start()
