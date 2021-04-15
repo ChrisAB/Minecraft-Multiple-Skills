@@ -130,7 +130,7 @@ class SkillTrainer:
     def plot_durations(self):
         plt.figure(2)
         plt.clf()
-        print(self.episode_durations)
+        print(self.episode_durations, flush=True)
         durations_t = torch.tensor(self.episode_durations, dtype=torch.float)
         plt.title('Training...')
         plt.xlabel('Episode')
@@ -147,15 +147,15 @@ class SkillTrainer:
         plt.show()
 
     def start(self):
-        print("Starting...")
+        print("Starting...", flush=True)
         num_episodes = self.args.episodes
         for i_episode in range(num_episodes):
-            print("Starting episode " + str(i_episode))
+            print("Starting episode " + str(i_episode), flush=True)
             # Initialize the environment and state
             obs = self.env.reset()
-            print("Env was reset")
+            print("Env was reset", flush=True)
             state = self.preprocess_image(obs)
-            print("Image was preprocessed")
+            print("Image was preprocessed", flush=True)
             for t in count():
                 # Select and perform an action
                 action = self.select_action(state)
@@ -181,22 +181,23 @@ class SkillTrainer:
                     break
                 if self.args.saveimagesteps > 0 and t % self.args.saveimagesteps == 0:
                     print('Saved image ' + str(i_episode) +
-                          '_' + str(t) + '.png')
+                          '_' + str(t) + '.png', flush=True)
                     img_obs = obs.copy()
                     img_obs = img_obs.reshape(84, 84, 3)
                     img_obs = np.flipud(img_obs)
                     img = Image.fromarray(img_obs)
                     img.save('tmp_images/image' +
                              str(i_episode) + '_' + str(t) + '.png')
-            print("Finished episode")
+            print("Finished episode", flush=True)
             # Update the target network, copying all weights and biases in DQN
             if i_episode % self.TARGET_UPDATE == 0:
-                print("Updating target at episode " + str(i_episode))
+                print("Updating target at episode " +
+                      str(i_episode), flush=True)
                 self.target_net.load_state_dict(self.policy_net.state_dict())
                 self.plot_durations()
             time.sleep(5)
 
-        print('Complete')
+        print('Complete', flush=True)
         self.env.render()
         self.env.close()
 
