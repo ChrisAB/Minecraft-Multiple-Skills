@@ -142,9 +142,7 @@ class SkillTrainer:
             means = torch.cat((torch.zeros(99), means))
             plt.plot(means.numpy())
 
-        plt.pause(0.001)  # pause a bit so that plots are updated
-        plt.savefig(self.args.plot_image_location)
-        plt.show()
+        plt.savefig(self.args.plot_image_location, bbox_inches='tight')
 
     def start(self):
         print("Starting...", flush=True)
@@ -195,7 +193,6 @@ class SkillTrainer:
                       str(i_episode), flush=True)
                 self.target_net.load_state_dict(self.policy_net.state_dict())
                 self.plot_durations()
-            time.sleep(5)
 
         print('Complete', flush=True)
         self.env.render()
