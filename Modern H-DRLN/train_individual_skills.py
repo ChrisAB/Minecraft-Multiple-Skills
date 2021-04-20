@@ -14,6 +14,7 @@ import random
 import math
 import re
 import numpy as np
+from array2gif import write_gif
 
 
 class SkillTrainer:
@@ -165,6 +166,8 @@ class SkillTrainer:
                     next_state = self.preprocess_image(obs)
                 else:
                     next_state = None
+                    write_gif(self.memory.memory[self.memory.position-t:self.memory.position],
+                              'tmp_images/gif_' + str(i_episode) + '.gif', fps=5)
 
                 # Store the transition in memory
                 self.memory.push(state, action, next_state, reward)
