@@ -1,20 +1,28 @@
 // For those who want the bleeding edge
 buildscript {
     repositories {
+        maven { url 'https://jitpack.io' }
         jcenter()
+        mavenCentral()
         maven {
             url = 'https://maven.minecraftforge.net/'
         }
         maven {
             url = "http://files.minecraftforge.net/maven"
         }
+        maven {
+            url = "http://files.minecraftforge.net"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'com.github.brandonhoughton:ForgeGradle:FG_2.2_patched-SNAPSHOT'
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
-
 
 // Read the version number from the Mod's version properties file.
 if (!file('src/main/resources/version.properties').exists()) {
