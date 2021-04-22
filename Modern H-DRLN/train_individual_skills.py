@@ -16,6 +16,8 @@ import math
 import re
 import numpy as np
 from array2gif import write_gif
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 
 class SkillTrainer:
