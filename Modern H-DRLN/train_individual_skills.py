@@ -16,8 +16,9 @@ import math
 import re
 import numpy as np
 from array2gif import write_gif
+from collections import OrderedDict
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.ERROR)
 
 
 class SkillTrainer:
@@ -27,8 +28,10 @@ class SkillTrainer:
             "cuda" if torch.cuda.is_available() else "cpu")
         self.initenv()
 
-        self.policy_net = DQN(number_of_actions=self.n_actions).to(self.device)
-        self.target_net = DQN(number_of_actions=self.n_actions).to(self.device)
+        self.policy_net = DQN(
+            input_dimensions=[3, 64, 64], number_of_actions=self.n_actions).to(self.device)
+        self.target_net = DQN(
+            input_dimensions=[3, 64, 64], number_of_actions=self.n_actions).to(self.device)
         self.target_net.load_state_dict(self.policy_net.state_dict())
         self.target_net.eval()
         self.optimizer = torch.optim.RMSprop(self.policy_net.parameters())
@@ -47,8 +50,18 @@ class SkillTrainer:
 
     def initenv(self):
         self.env = gym.make('MineRLNavigateDense-v0')
-
-        self.n_actions = self.env.action_space.__len__()
+        self.n_actions = 0
+        print(self.env.action_space.sample())
+        print(self.env.action_space.sample())
+        print(self.env.action_space.sample())
+        print(self.env.action_space.sample())
+        print(self.env.action_space.sample())
+        self.actions = list(self.env.action_space.noop().items())
+        for act in self.env.action_space:
+            if(type(self.env.action_space[act]) != minerl.herobraine.hero.spaces.Box):
+                print(self.env.action_space[act], self.env.action_space[act].n)
+                self.n_actions += self.env.action_space[act].n-1
+        self.n_actions += 2
 
     def select_action(self, state):
         sample = random.random()
@@ -62,11 +75,17 @@ class SkillTrainer:
                 # found, so we pick action with the larger expected reward.
                 action = self.policy_net(state).max(1)[1].view(1, 1)
                 action = action.item()
-                action = self.env.action_space.__getitem__(action)
-                action = int(re.search(r'\d+', action).group())
-                return torch.tensor([[action]], device=self.device, dtype=torch.long)
+                item = self.actions.copy()
+                noop = self.env.action_space.noop()
+                if(self.actions[action] == 'camera'):
+                    noop[self.actions[action][0]] = [0, 90]
+                elif(self.actions[action] == 'place'):
+                    noop[self.actions[action][0]] = 'dirt'
+                else:
+                    noop[self.actions[action][0]] = 1
+                return noop
         else:
-            return torch.tensor([[self.env.action_space.sample()]], device=self.device, dtype=torch.long)
+            return self.env.action_space.sample()
 
     def optimize_model(self):
         if len(self.memory) < self.BATCH_SIZE:
@@ -117,11 +136,10 @@ class SkillTrainer:
         self.optimizer.step()
 
     def preprocess_image(self, obs):
-        obs = obs.reshape(84, 84, 3)
-        np.flipud(obs)
-        obs = torchvision.transforms.functional.to_tensor(obs)
-        obs = self.grayscaler(obs)
-        obs = obs.reshape(1, 1, 84, 84)
+        obs = obs['pov']
+        obs = torchvision.transforms.functional.to_tensor(
+            np.flip(obs, axis=0).copy())
+        obs = obs.reshape(1, 3, 64, 64)
         return obs.to(self.device)
 
     def plot_durations(self):
@@ -148,6 +166,7 @@ class SkillTrainer:
             print("Starting episode " + str(i_episode), flush=True)
             # Initialize the environment and state
             obs = self.env.reset()
+            self.env.render(mode="rgb_array")
             print("Env was reset", flush=True)
             state = self.preprocess_image(obs)
             print("Image was preprocessed", flush=True)

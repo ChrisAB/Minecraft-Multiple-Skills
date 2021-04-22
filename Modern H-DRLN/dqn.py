@@ -43,7 +43,7 @@ class DQN(nn.Module):
         res = self.input_conv(x)
         res = self.input_nl(res)
         res = self.conv_layers(res)
-        res = res.reshape(res.size(0), 3136)
+        res = res.reshape(res.size(0), 1024)
         res = self.input_linear(res)
         res = self.linear_nl(res)
         if(len(self.number_of_hidden_neurons) > 1):
