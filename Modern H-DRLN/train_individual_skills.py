@@ -1,4 +1,5 @@
-import malmoenv
+import gym
+import minerl
 import argparse
 from pathlib import Path
 import time
@@ -44,14 +45,8 @@ class SkillTrainer:
 
     def initenv(self):
         xml = Path(self.args.mission).read_text()
-        self.env = malmoenv.make()
+        self.env = gym.make('MineRLNavigateDense-v0')
 
-        self.env.init(xml, self.args.port,
-                      server=self.args.server,
-                      server2=self.args.server2, port2=self.args.port2,
-                      role=self.args.role,
-                      exp_uid=self.args.experimentUniqueId,
-                      episode=self.args.episode, resync=self.args.resync)
         self.n_actions = self.env.action_space.__len__()
 
     def select_action(self, state):
