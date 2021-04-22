@@ -44,7 +44,6 @@ class SkillTrainer:
         self.episode_durations = []
 
     def initenv(self):
-        xml = Path(self.args.mission).read_text()
         self.env = gym.make('MineRLNavigateDense-v0')
 
         self.n_actions = self.env.action_space.__len__()
@@ -200,8 +199,6 @@ class SkillTrainer:
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='MALMOENV')
-    parser.add_argument('--mission', type=str,
-                        default='../Malmo/MalmoEnv/missions/mobchase_single_agent.xml', help='the mission xml')
     parser.add_argument('--port', type=int, default=10000,
                         help='the mission server port')
     parser.add_argument('--server', type=str, default='127.0.0.1',
