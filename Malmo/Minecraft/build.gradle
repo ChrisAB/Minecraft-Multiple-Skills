@@ -19,15 +19,14 @@ buildscript {
     }
 }
 
-plugins {
-    id 'java'
+repositories {
+    maven { url = 'https://libraries.minecraft.net/' }
+    mavenCentral()
+    maven { url = 'https://maven.minecraftforge.net/' }
 }
-dependencies {
-    implementation 'com.github.brandonhoughton:forgegradle:FG_2.2_patched-SNAPSHOT'
-}
+
+
 apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'java'
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 // Read the version number from the Mod's version properties file.
 if (!file('src/main/resources/version.properties').exists()) {
@@ -52,12 +51,6 @@ minecraft {
     // simply re-run your setup task after changing the mappings to update your workspace.
     mappings = "snapshot_20161220"
     makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-}
-
-runClient {
-    if (project.hasProperty("runDir")) {
-        minecraft.runDir = project.getProperty("runDir")
-    }
 }
 
 // Add the overclocking plugin to the manifest so that it is loaded when running in a non-dev environment (eg from the launcher)
@@ -220,4 +213,3 @@ task copyModToServer(type: Copy) {
 }
 
 javadoc.dependsOn copyMds
-
