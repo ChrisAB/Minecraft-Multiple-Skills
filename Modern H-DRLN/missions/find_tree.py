@@ -9,7 +9,7 @@ import minerl.herobraine.hero.handlers as handlers
 NAVIGATE_STEPS = 6000
 
 
-class TreeNavigate(SimpleEmbodimentEnvSpec):
+class NavigateTree(SimpleEmbodimentEnvSpec):
     def __init__(self, dense=False, extreme=False, *args, **kwargs):
         name = 'MineRLNavigateTree-v0'
         self.dense = dense
