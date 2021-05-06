@@ -15,12 +15,12 @@ import random
 import math
 import re
 import numpy as np
-from array2gif import write_gif
 from collections import OrderedDict
 from utils.action_converter import ActionConverter
 import logging
 import missions
 import copy
+import cv2
 logging.basicConfig(level=logging.ERROR)
 
 
@@ -129,7 +129,7 @@ class SkillTrainer:
 
     def preprocess_image(self, obs):
         obs = obs['pov']
-        self.current_episode_observation += obs
+        self.current_episode_observation += [obs]
         obs = torchvision.transforms.functional.to_tensor(
             np.flip(obs, axis=0).copy())
         obs = obs.reshape(1, 3, 64, 64)
@@ -175,8 +175,11 @@ class SkillTrainer:
                     next_state = self.preprocess_image(obs)
                 else:
                     next_state = None
-                    write_gif(self.current_episode_observation,
-                              'tmp_images/gif_' + str(i_episode) + '.gif', fps=5)
+                    out = cv2.VideoWriter(
+                        'tmp_images/gif_' + str(i_episode) + '.gif', cv2.VideoWriter_fourcc(*'DIVX'), 30, (64, 64))
+                    for i in self.current_episode_observation:
+                        out.write(i)
+                    out.release()
 
                 # Store the transition in memory
                 action = self.action_converter.convert_to_array(action)
