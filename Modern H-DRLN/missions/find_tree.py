@@ -3,7 +3,6 @@ from minerl.herobraine.env_specs.simple_embodiment import SimpleEmbodimentEnvSpe
 from minerl.herobraine.hero.handler import Handler
 import sys
 from typing import List
-
 import minerl.herobraine
 import minerl.herobraine.hero.handlers as handlers
 
@@ -11,8 +10,10 @@ NAVIGATE_STEPS = 6000
 
 
 class TreeNavigate(SimpleEmbodimentEnvSpec):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, dense=False, extreme=False, *args, **kwargs):
         name = 'MineRLNavigateTree-v0'
+        self.dense = dense
+        self.extreme = extreme
         super().__init__(name, *args, max_episode_steps=6000, **kwargs)
 
     def is_from_folder(self, folder: str) -> bool:

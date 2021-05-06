@@ -224,6 +224,8 @@ if __name__ == '__main__':
                         help='the mission server port')
     parser.add_argument('--server', type=str, default='127.0.0.1',
                         help='the mission server DNS or IP address')
+    parser.add_argument('--mission', type=str, default='MineRLObtainLog-v0',
+                        help='the mission ID')
     parser.add_argument('--port2', type=int, default=None,
                         help="(Multi-agent) role N's mission port. Defaults to server port.")
     parser.add_argument('--server2', type=str, default=None,
