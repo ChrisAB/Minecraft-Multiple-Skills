@@ -3,7 +3,7 @@ from minerl.herobraine.env_specs.obtain_specs import Obtain
 
 class ObtainStick(Obtain):
 
-    def __init__(self, dense, *args, **kwargs):
+    def __init__(self, dense=False, *args, **kwargs):
         super(ObtainStick, self).__init__(*args,
                                           target_item='stick',
                                           dense=dense,

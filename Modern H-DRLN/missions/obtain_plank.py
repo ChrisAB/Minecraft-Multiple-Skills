@@ -3,7 +3,7 @@ from minerl.herobraine.env_specs.obtain_specs import Obtain
 
 class ObtainPlank(Obtain):
 
-    def __init__(self, dense, *args, **kwargs):
+    def __init__(self, dense=False, *args, **kwargs):
         super(ObtainPlank, self).__init__(*args,
                                           target_item='plank',
                                           dense=dense,
