@@ -17,7 +17,10 @@ import re
 import numpy as np
 from array2gif import write_gif
 from collections import OrderedDict
+from utils.action_converter import ActionConverter
 import logging
+import missions
+import copy
 logging.basicConfig(level=logging.ERROR)
 
 
@@ -35,7 +38,7 @@ class SkillTrainer:
         self.target_net.load_state_dict(self.policy_net.state_dict())
         self.target_net.eval()
         self.optimizer = torch.optim.RMSprop(self.policy_net.parameters())
-        self.memory = ReplayMemory(10000)
+        self.memory = ReplayMemory(200000)
         self.grayscaler = torchvision.transforms.Grayscale()
 
         self.BATCH_SIZE = 128
@@ -47,21 +50,15 @@ class SkillTrainer:
 
         self.steps_done = 0
         self.episode_durations = []
+        self.current_episode_observation = []
 
     def initenv(self):
-        self.env = gym.make('MineRLNavigateDense-v0')
-        self.n_actions = 0
-        print(self.env.action_space.sample())
-        print(self.env.action_space.sample())
-        print(self.env.action_space.sample())
-        print(self.env.action_space.sample())
-        print(self.env.action_space.sample())
-        self.actions = list(self.env.action_space.noop().items())
-        for act in self.env.action_space:
-            if(type(self.env.action_space[act]) != minerl.herobraine.hero.spaces.Box):
-                print(self.env.action_space[act], self.env.action_space[act].n)
-                self.n_actions += self.env.action_space[act].n-1
-        self.n_actions += 2
+        self.env = gym.make(self.args.mission)
+        self.action_converter = ActionConverter(self.env.action_space.noop())
+        self.n_actions = len(self.action_converter.actions_array)
+        print(self.action_converter.actions)
+        print(self.action_converter.actions_array)
+        print(self.n_actions)
 
     def select_action(self, state):
         sample = random.random()
@@ -75,15 +72,9 @@ class SkillTrainer:
                 # found, so we pick action with the larger expected reward.
                 action = self.policy_net(state).max(1)[1].view(1, 1)
                 action = action.item()
-                item = self.actions.copy()
-                noop = self.env.action_space.noop()
-                if(self.actions[action] == 'camera'):
-                    noop[self.actions[action][0]] = [0, 90]
-                elif(self.actions[action] == 'place'):
-                    noop[self.actions[action][0]] = 'dirt'
-                else:
-                    noop[self.actions[action][0]] = 1
-                return noop
+                actions = copy.deepcopy(self.action_converter.actions_array)
+                actions[action] = 1
+                return self.action_converter.convert_to_ordereddict(actions)
         else:
             return self.env.action_space.sample()
 
@@ -103,14 +94,15 @@ class SkillTrainer:
                                            if s is not None])
 
         state_batch = torch.cat(batch.state)
-        action_batch = torch.cat(batch.action)
+        action_batch = torch.stack(batch.action)
         reward_batch = torch.cat(batch.reward)
 
         # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
         # columns of actions taken. These are the actions which would've been taken
         # for each batch state according to policy_net
         state_action_values = self.policy_net(
-            state_batch).gather(1, action_batch)
+            state_batch)
+        state_action_values = state_action_values.gather(0, action_batch)
 
         # Compute V(s_{t+1}) for all next states.
         # Expected values of actions for non_final_next_states are computed based
@@ -137,6 +129,7 @@ class SkillTrainer:
 
     def preprocess_image(self, obs):
         obs = obs['pov']
+        self.current_episode_observation += obs
         obs = torchvision.transforms.functional.to_tensor(
             np.flip(obs, axis=0).copy())
         obs = obs.reshape(1, 3, 64, 64)
@@ -166,6 +159,7 @@ class SkillTrainer:
             print("Starting episode " + str(i_episode), flush=True)
             # Initialize the environment and state
             obs = self.env.reset()
+            self.current_episode_observation = []
             self.env.render(mode="rgb_array")
             print("Env was reset", flush=True)
             state = self.preprocess_image(obs)
@@ -181,10 +175,13 @@ class SkillTrainer:
                     next_state = self.preprocess_image(obs)
                 else:
                     next_state = None
-                    write_gif(self.memory.memory[self.memory.position-t:self.memory.position],
+                    write_gif(self.current_episode_observation,
                               'tmp_images/gif_' + str(i_episode) + '.gif', fps=5)
 
                 # Store the transition in memory
+                action = self.action_converter.convert_to_array(action)
+                action = np.array(action)
+                action = torch.from_numpy(action).to(self.device)
                 self.memory.push(state, action, next_state, reward)
 
                 # Move to the next state
