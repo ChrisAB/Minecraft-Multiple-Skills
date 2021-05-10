@@ -30,23 +30,30 @@ class SkillTrainer:
         self.device = torch.device(
             "cuda" if torch.cuda.is_available() else "cpu")
         self.initenv()
-
         self.policy_net = DQN(
-            input_dimensions=[3, 64, 64], number_of_actions=self.n_actions).to(self.device)
+            input_dimensions=self.args.INPUT_DIMENSIONS, number_of_actions=self.n_actions).to(self.device)
         self.target_net = DQN(
-            input_dimensions=[3, 64, 64], number_of_actions=self.n_actions).to(self.device)
+            input_dimensions=self.args.INPUT_DIMENSIONS, number_of_actions=self.n_actions).to(self.device)
+        if(self.args.episode != 0):
+            try:
+                self.policy_net.load_state_dict(torch.load(
+                    self.args.CHECKPOINT_SAVE_LOCATION + self.args.mission + '_' + str(self.args.episode) + '.pt'))
+                self.policy_net.eval()
+            except:
+                print("Could not load checkpoint from location: " + self.args.CHECKPOINT_SAVE_LOCATION +
+                      self.args.mission + '_' + str(self.args.episode) + '.pt')
         self.target_net.load_state_dict(self.policy_net.state_dict())
         self.target_net.eval()
         self.optimizer = torch.optim.RMSprop(self.policy_net.parameters())
-        self.memory = ReplayMemory(200000)
+        self.memory = ReplayMemory(self.args.REPLAY_MEMORY_SIZE)
         self.grayscaler = torchvision.transforms.Grayscale()
 
-        self.BATCH_SIZE = 128
-        self.GAMMA = 0.999
-        self.EPS_START = 0.9
-        self.EPS_END = 0.05
-        self.EPS_DECAY = 200
-        self.TARGET_UPDATE = 10
+        self.BATCH_SIZE = self.args.BATCH_SIZE
+        self.GAMMA = self.args.GAMMA
+        self.EPS_START = self.args.EPS_START
+        self.EPS_END = self.args.EPS_END
+        self.EPS_DECAY = self.args.EPS_DECAY
+        self.TARGET_UPDATE = self.args.TARGET_UPDATE
 
         self.steps_done = 0
         self.episode_durations = []
@@ -154,7 +161,7 @@ class SkillTrainer:
 
     def start(self):
         print("Starting...", flush=True)
-        num_episodes = self.args.episodes
+        num_episodes = self.args.episodes - self.args.episode
         for i_episode in range(num_episodes):
             print("Starting episode " + str(i_episode), flush=True)
             # Initialize the environment and state
@@ -175,11 +182,12 @@ class SkillTrainer:
                     next_state = self.preprocess_image(obs)
                 else:
                     next_state = None
-                    out = cv2.VideoWriter(
-                        'tmp_images/gif_' + str(i_episode) + '.gif', cv2.VideoWriter_fourcc(*'DIVX'), 30, (64, 64))
-                    for i in self.current_episode_observation:
-                        out.write(i)
-                    out.release()
+                    if self.args.savevideosteps > 0 and i_episode % self.args.savevideosteps == 0:
+                        out = cv2.VideoWriter(
+                            self.args.REPLAY_CAPTURE_LOCATION + 'gif_' + str(i_episode) + '.gif', cv2.VideoWriter_fourcc(*'DIVX'), 30, (self.args.INPUT_DIMENSIONS[1], self.ars.INPUT_DIMENSIONS[2]))
+                        for i in self.current_episode_observation:
+                            out.write(i)
+                        out.release()
 
                 # Store the transition in memory
                 action = self.action_converter.convert_to_array(action)
@@ -198,17 +206,18 @@ class SkillTrainer:
                 if self.args.saveimagesteps > 0 and t % self.args.saveimagesteps == 0:
                     print('Saved image ' + str(i_episode) +
                           '_' + str(t) + '.png', flush=True)
-                    img_obs = obs.copy()
-                    img_obs = img_obs.reshape(84, 84, 3)
+                    img_obs = obs['pov']
                     img_obs = np.flipud(img_obs)
                     img = Image.fromarray(img_obs)
-                    img.save('tmp_images/image' +
+                    img.save(self.args.IMAGE_CAPTURE_LOCATION + 'image' +
                              str(i_episode) + '_' + str(t) + '.png')
             print("Finished episode", flush=True)
             # Update the target network, copying all weights and biases in DQN
             if i_episode % self.TARGET_UPDATE == 0:
                 print("Updating target at episode " +
                       str(i_episode), flush=True)
+                torch.save(self.policy_net.state_dict(),
+                           self.args.CHECKPOINT_SAVE_LOCATION + self.args.mission + '_' + str(i_episode) + '.pt')
                 self.target_net.load_state_dict(self.policy_net.state_dict())
                 self.plot_durations()
 
@@ -240,6 +249,8 @@ if __name__ == '__main__':
                         default=0, help='max number of steps per episode')
     parser.add_argument('--saveimagesteps', type=int,
                         default=0, help='save an image every N steps')
+    parser.add_argument('--savevideosteps', type=int,
+                        default=0, help='save a video every N episodes')
     parser.add_argument('--resync', type=int, default=0, help='exit and re-sync every N resets'
                                                               ' - default is 0 meaning never.')
     parser.add_argument('--experimentUniqueId', type=str,
