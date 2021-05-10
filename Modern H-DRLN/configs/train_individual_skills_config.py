@@ -9,3 +9,4 @@ REPLAY_MEMORY_SIZE = 200000
 IMAGE_CAPTURE_LOCATION = './../tmp_images/'
 REPLAY_CAPTURE_LOCATION = './../tmp_videos/'
 CHECKPOINT_SAVE_LOCATION = './../checkpoints/'
+PLOT_IMAGE_LOCATION = './../plot.png'
