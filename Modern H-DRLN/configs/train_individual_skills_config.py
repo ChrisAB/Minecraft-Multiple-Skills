@@ -1,6 +1,6 @@
 PORT = 10000
 SERVER = '127.0.0.1'
-MISSION = 'MineRLObtainLog-v0'
+MISSION = 'MineRLNavigateTree-v0'
 PORT2 = None
 SERVER2 = None
 EPISODES = 1
