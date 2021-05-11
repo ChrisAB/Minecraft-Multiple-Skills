@@ -22,6 +22,7 @@ import logging
 import missions
 import copy
 import cv2
+from multiprocessing import Process, Queue
 logging.basicConfig(level=logging.ERROR)
 
 
@@ -184,7 +185,7 @@ class SkillTrainer:
                     next_state = None
                     if self.args.savevideosteps > 0 and i_episode % self.args.savevideosteps == 0:
                         out = cv2.VideoWriter(
-                            self.args.REPLAY_CAPTURE_LOCATION + 'gif_' + str(i_episode) + '.gif', cv2.VideoWriter_fourcc(*'DIVX'), 30, (self.args.INPUT_DIMENSIONS[1], self.ars.INPUT_DIMENSIONS[2]))
+                            self.args.REPLAY_CAPTURE_LOCATION + 'gif_' + str(i_episode) + '.gif', cv2.VideoWriter_fourcc(*'DIVX'), 30, (self.args.INPUT_DIMENSIONS[1], self.args.INPUT_DIMENSIONS[2]))
                         for i in self.current_episode_observation:
                             out.write(i)
                         out.release()
