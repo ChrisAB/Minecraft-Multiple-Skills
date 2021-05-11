@@ -158,12 +158,11 @@ class SkillTrainer:
             means = torch.cat((torch.zeros(99), means))
             plt.plot(means.numpy())
 
-        plt.savefig(self.args.plot_image_location, bbox_inches='tight')
+        plt.savefig(self.args.PLOT_IMAGE_LOCATION, bbox_inches='tight')
 
     def start(self):
         print("Starting...", flush=True)
-        num_episodes = self.args.episodes - self.args.episode
-        for i_episode in range(num_episodes):
+        for i_episode in range(self.args.episode, self.args.episodes):
             print("Starting episode " + str(i_episode), flush=True)
             # Initialize the environment and state
             obs = self.env.reset()
@@ -230,35 +229,52 @@ class SkillTrainer:
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='MALMOENV')
-    parser.add_argument('--port', type=int, default=10000,
+    parser.add_argument('--port', type=int, default=train_individual_skills_config.PORT,
                         help='the mission server port')
-    parser.add_argument('--server', type=str, default='127.0.0.1',
+    parser.add_argument('--server', type=str, default=train_individual_skills_config.SERVER,
                         help='the mission server DNS or IP address')
-    parser.add_argument('--mission', type=str, default='MineRLObtainLog-v0',
+    parser.add_argument('--mission', type=str, default=train_individual_skills_config.MISSION,
                         help='the mission ID')
-    parser.add_argument('--port2', type=int, default=None,
+    parser.add_argument('--port2', type=int, default=train_individual_skills_config.PORT2,
                         help="(Multi-agent) role N's mission port. Defaults to server port.")
-    parser.add_argument('--server2', type=str, default=None,
+    parser.add_argument('--server2', type=str, default=train_individual_skills_config.SERVER2,
                         help="(Multi-agent) role N's server DNS or IP")
-    parser.add_argument('--episodes', type=int, default=1,
+    parser.add_argument('--episodes', type=int, default=train_individual_skills_config.EPISODES,
                         help='the number of resets to perform - default is 1')
-    parser.add_argument('--episode', type=int, default=0,
+    parser.add_argument('--episode', type=int, default=train_individual_skills_config.EPISODE,
                         help='the start episode - default is 0')
-    parser.add_argument('--role', type=int, default=0,
+    parser.add_argument('--role', type=int, default=train_individual_skills_config.ROLE,
                         help='the agent role - defaults to 0')
-    parser.add_argument('--episodemaxsteps', type=int,
-                        default=0, help='max number of steps per episode')
     parser.add_argument('--saveimagesteps', type=int,
-                        default=0, help='save an image every N steps')
+                        default=train_individual_skills_config.SAVEIMAGESTEPS, help='save an image every N steps')
     parser.add_argument('--savevideosteps', type=int,
-                        default=0, help='save a video every N episodes')
-    parser.add_argument('--resync', type=int, default=0, help='exit and re-sync every N resets'
-                                                              ' - default is 0 meaning never.')
-    parser.add_argument('--experimentUniqueId', type=str,
-                        default='test1', help="the experiment's unique id.")
+                        default=train_individual_skills_config.SAVEVIDEOSTEPS, help='save a video every N episodes')
+    parser.add_argument('--BATCH_SIZE', type=int,
+                        default=train_individual_skills_config.BATCH_SIZE, help='batch size')
+    parser.add_argument('--GAMMA', type=int, default=train_individual_skills_config.GAMMA,
+                        help='Gamma for expected Q values')
+    parser.add_argument('--EPS_START', type=int,
+                        default=train_individual_skills_config.EPS_START, help='epsilon start')
+    parser.add_argument('--EPS_END', type=int,
+                        default=train_individual_skills_config.EPS_END, help='epsilon end')
+    parser.add_argument('--EPS_DECAY', type=int,
+                        default=train_individual_skills_config.EPS_DECAY, help='epsilon decay')
+    parser.add_argument('--INPUT_DIMENSIONS', type=int,
+                        default=train_individual_skills_config.INPUT_DIMENSIONS, help='DQN input dimensions')
+    parser.add_argument('--TARGET_UPDATE', type=int, default=train_individual_skills_config.TARGET_UPDATE,
+                        help='how often to update target_dict. Also how often to save checkpoint')
+    parser.add_argument('--REPLAY_MEMORY_SIZE', type=int,
+                        default=train_individual_skills_config.REPLAY_MEMORY_SIZE, help='replay memory size')
+    parser.add_argument('--IMAGE_CAPTURE_LOCATION', type=int,
+                        default=train_individual_skills_config.IMAGE_CAPTURE_LOCATION, help='where to capture images during episodes')
+    parser.add_argument('--REPLAY_CAPTURE_LOCATION', type=int,
+                        default=train_individual_skills_config.REPLAY_CAPTURE_LOCATION, help='where to capture the replay')
+    parser.add_argument('--CHECKPOINT_SAVE_LOCATION', type=int,
+                        default=train_individual_skills_config.CHECKPOINT_SAVE_LOCATION, help='where to save checkpoints')
+    parser.add_argument('--PLOT_IMAGE_LOCATION', type=int, default=train_individual_skills_config.PLOT_IMAGE_LOCATION,
+                        help='where to plot the graph showing duration/episode')
     args = parser.parse_args()
     if args.server2 is None:
         args.server2 = args.server
-    args.plot_image_location = '/content/plot.png'
     trainer = SkillTrainer(args)
     trainer.start()
