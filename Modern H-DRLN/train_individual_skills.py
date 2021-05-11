@@ -251,27 +251,27 @@ if __name__ == '__main__':
                         default=train_individual_skills_config.SAVEVIDEOSTEPS, help='save a video every N episodes')
     parser.add_argument('--BATCH_SIZE', type=int,
                         default=train_individual_skills_config.BATCH_SIZE, help='batch size')
-    parser.add_argument('--GAMMA', type=int, default=train_individual_skills_config.GAMMA,
+    parser.add_argument('--GAMMA', type=float, default=train_individual_skills_config.GAMMA,
                         help='Gamma for expected Q values')
-    parser.add_argument('--EPS_START', type=int,
+    parser.add_argument('--EPS_START', type=float,
                         default=train_individual_skills_config.EPS_START, help='epsilon start')
-    parser.add_argument('--EPS_END', type=int,
+    parser.add_argument('--EPS_END', type=float,
                         default=train_individual_skills_config.EPS_END, help='epsilon end')
-    parser.add_argument('--EPS_DECAY', type=int,
+    parser.add_argument('--EPS_DECAY', type=float,
                         default=train_individual_skills_config.EPS_DECAY, help='epsilon decay')
-    parser.add_argument('--INPUT_DIMENSIONS', type=int,
+    parser.add_argument('--INPUT_DIMENSIONS', type=list,
                         default=train_individual_skills_config.INPUT_DIMENSIONS, help='DQN input dimensions')
     parser.add_argument('--TARGET_UPDATE', type=int, default=train_individual_skills_config.TARGET_UPDATE,
                         help='how often to update target_dict. Also how often to save checkpoint')
     parser.add_argument('--REPLAY_MEMORY_SIZE', type=int,
                         default=train_individual_skills_config.REPLAY_MEMORY_SIZE, help='replay memory size')
-    parser.add_argument('--IMAGE_CAPTURE_LOCATION', type=int,
+    parser.add_argument('--IMAGE_CAPTURE_LOCATION', type=str,
                         default=train_individual_skills_config.IMAGE_CAPTURE_LOCATION, help='where to capture images during episodes')
-    parser.add_argument('--REPLAY_CAPTURE_LOCATION', type=int,
+    parser.add_argument('--REPLAY_CAPTURE_LOCATION', type=str,
                         default=train_individual_skills_config.REPLAY_CAPTURE_LOCATION, help='where to capture the replay')
-    parser.add_argument('--CHECKPOINT_SAVE_LOCATION', type=int,
+    parser.add_argument('--CHECKPOINT_SAVE_LOCATION', type=str,
                         default=train_individual_skills_config.CHECKPOINT_SAVE_LOCATION, help='where to save checkpoints')
-    parser.add_argument('--PLOT_IMAGE_LOCATION', type=int, default=train_individual_skills_config.PLOT_IMAGE_LOCATION,
+    parser.add_argument('--PLOT_IMAGE_LOCATION', type=str, default=train_individual_skills_config.PLOT_IMAGE_LOCATION,
                         help='where to plot the graph showing duration/episode')
     args = parser.parse_args()
     if args.server2 is None:
