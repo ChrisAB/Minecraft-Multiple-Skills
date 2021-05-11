@@ -163,13 +163,17 @@ class SkillTrainer:
 
     def start(self):
         print("Starting...", flush=True)
+        start_time = time.time()
         for i_episode in range(self.args.episode, self.args.episodes):
-            print("Starting episode " + str(i_episode), flush=True)
+            print("Starting episode {}. Last episode took {} seconds".format(
+                i_episode, time.time()-start_time), flush=True)
+            start_time = time.time()
             # Initialize the environment and state
             obs = self.env.reset()
             self.current_episode_observation = []
             self.env.render(mode="rgb_array")
-            print("Env was reset", flush=True)
+            print("Env was reset. Took {} seconds to reset it.".format(
+                time.time() - start_time), flush=True)
             state = self.preprocess_image(obs)
             print("Image was preprocessed", flush=True)
             for t in count():
@@ -204,7 +208,7 @@ class SkillTrainer:
                 if done:
                     self.episode_durations.append(t + 1)
                     break
-                if self.args.saveimagesteps > 0 and t % self.args.saveimagesteps == 0:
+                if self.args.saveimagesteps > 0 and t % self.args.saveimagesteps == 0 and t not 0:
                     print('Saved image ' + str(i_episode) +
                           '_' + str(t) + '.png', flush=True)
                     img_obs = obs['pov']
