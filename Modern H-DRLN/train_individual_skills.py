@@ -230,7 +230,7 @@ class SkillTrainer:
                 'observations': self.current_episode_observation,
                 'actions': self.current_episode_actions,
                 'rewards': self.current_episode_rewards
-            }, './data_out' + self.args.mission + '_' + str(i_episode) + '.pt')
+            }, './data_out/' + self.args.mission + '_' + str(i_episode) + '.pt')
             # Update the target network, copying all weights and biases in DQN
             if i_episode % self.TARGET_UPDATE == 0:
                 print("Updating target at episode " +
