@@ -67,6 +67,7 @@ class SkillTrainer:
             self.episode_durations = self.loaded.episode_durations
         self.current_episode_observation = []
         self.current_episode_actions = []
+        self.current_episode_rewards = []
 
     def initenv(self):
         self.env = gym.make(self.args.mission)
@@ -176,6 +177,7 @@ class SkillTrainer:
             obs = self.env.reset()
             self.current_episode_observation = []
             self.current_episode_actions = []
+            self.current_episode_rewards = []
             self.env.render(mode="rgb_array")
             print("Env was reset. Took {} seconds to reset it.".format(
                 time.time() - start_time), flush=True)
@@ -185,6 +187,7 @@ class SkillTrainer:
                 # Select and perform an action
                 action = self.select_action(state)
                 obs, reward, done, info = self.env.step(action)
+                self.current_episode_rewards += reward
                 reward = torch.tensor([reward], device=self.device)
 
                 # Observe new state
@@ -201,7 +204,7 @@ class SkillTrainer:
 
                 # Store the transition in memory
                 action = self.action_converter.convert_to_array(action)
-                self.current_episode_actions += action
+                self.current_episode_actions += [action]
                 action = np.array(action)
                 action = torch.from_numpy(action).to(self.device)
                 self.memory.push(state, action, next_state, reward)
@@ -225,7 +228,8 @@ class SkillTrainer:
             print("Finished episode", flush=True)
             torch.save({
                 'observations': self.current_episode_observation,
-                'actions': self.current_episode_actions
+                'actions': self.current_episode_actions,
+                'rewards': self.current_episode_rewards
             }, './data_out' + self.args.mission + '_' + str(i_episode) + '.pt')
             # Update the target network, copying all weights and biases in DQN
             if i_episode % self.TARGET_UPDATE == 0:
