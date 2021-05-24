@@ -22,12 +22,13 @@ import logging
 import missions
 import copy
 import cv2
-from multiprocessing import Process, Queue
+import time
 logging.basicConfig(level=logging.ERROR)
 
 
 class SkillTrainer:
     def __init__(self, args):
+        self.loaded = False
         self.args = args
         self.device = torch.device(
             "cuda" if torch.cuda.is_available() else "cpu")
@@ -37,9 +38,10 @@ class SkillTrainer:
         self.target_net = DQN(
             input_dimensions=self.args.INPUT_DIMENSIONS, number_of_actions=self.n_actions).to(self.device)
         if(self.args.episode != 0):
+            self.loaded = torch.load(
+                self.args.CHECKPOINT_SAVE_LOCATION + self.args.mission + '_' + str(self.args.episode) + '.pt')
             try:
-                self.policy_net.load_state_dict(torch.load(
-                    self.args.CHECKPOINT_SAVE_LOCATION + self.args.mission + '_' + str(self.args.episode) + '.pt'))
+                self.policy_net.load_state_dict(self.loaded.nn)
                 self.policy_net.eval()
             except:
                 print("Could not load checkpoint from location: " + self.args.CHECKPOINT_SAVE_LOCATION +
@@ -58,16 +60,17 @@ class SkillTrainer:
         self.TARGET_UPDATE = self.args.TARGET_UPDATE
 
         self.steps_done = 0
+        if(self.loaded):
+            self.steps_done = self.loaded.steps_done
         self.episode_durations = []
+        if(self.loaded):
+            self.episode_durations = self.loaded.episode_durations
         self.current_episode_observation = []
 
     def initenv(self):
         self.env = gym.make(self.args.mission)
         self.action_converter = ActionConverter(self.env.action_space.noop())
         self.n_actions = len(self.action_converter.actions_array)
-        print(self.action_converter.actions)
-        print(self.action_converter.actions_array)
-        print(self.n_actions)
 
     def select_action(self, state):
         sample = random.random()
@@ -187,7 +190,7 @@ class SkillTrainer:
                     next_state = self.preprocess_image(obs)
                 else:
                     next_state = None
-                    if self.args.savevideosteps > 0 and i_episode % self.args.savevideosteps == 0:
+                    if self.args.savevideosteps > 0 and i_episode % self.args.savevideosteps == 0 and i_episode != self.args.episode:
                         out = cv2.VideoWriter(
                             self.args.REPLAY_CAPTURE_LOCATION + 'gif_' + str(i_episode) + '.avi', cv2.VideoWriter_fourcc(*'DIVX'), 30, (self.args.INPUT_DIMENSIONS[1], self.args.INPUT_DIMENSIONS[2]))
                         for i in self.current_episode_observation:
@@ -208,7 +211,7 @@ class SkillTrainer:
                 if done:
                     self.episode_durations.append(t + 1)
                     break
-                if self.args.saveimagesteps > 0 and t % self.args.saveimagesteps == 0 and t not 0:
+                if self.args.saveimagesteps > 0 and t % self.args.saveimagesteps == 0 and t != 0:
                     print('Saved image ' + str(i_episode) +
                           '_' + str(t) + '.png', flush=True)
                     img_obs = obs['pov']
@@ -221,7 +224,10 @@ class SkillTrainer:
             if i_episode % self.TARGET_UPDATE == 0:
                 print("Updating target at episode " +
                       str(i_episode), flush=True)
-                torch.save(self.policy_net.state_dict(),
+                torch.save({'steps_done': self.steps_done,
+                            'episode_durations': self.episode_durations,
+                            'memory': self.memory,
+                            'nn': self.policy_net.state_dict()},
                            self.args.CHECKPOINT_SAVE_LOCATION + self.args.mission + '_' + str(i_episode) + '.pt')
                 self.target_net.load_state_dict(self.policy_net.state_dict())
                 self.plot_durations()
