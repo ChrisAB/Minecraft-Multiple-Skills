@@ -237,7 +237,6 @@ class SkillTrainer:
                       str(i_episode), flush=True)
                 torch.save({'steps_done': self.steps_done,
                             'episode_durations': self.episode_durations,
-                            'memory': self.memory,
                             'nn': self.policy_net.state_dict()},
                            self.args.CHECKPOINT_SAVE_LOCATION + self.args.mission + '_' + str(i_episode) + '.pt')
                 self.target_net.load_state_dict(self.policy_net.state_dict())
