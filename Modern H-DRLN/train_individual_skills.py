@@ -66,6 +66,7 @@ class SkillTrainer:
         if(self.loaded):
             self.episode_durations = self.loaded.episode_durations
         self.current_episode_observation = []
+        self.current_episode_actions = []
 
     def initenv(self):
         self.env = gym.make(self.args.mission)
@@ -174,6 +175,7 @@ class SkillTrainer:
             # Initialize the environment and state
             obs = self.env.reset()
             self.current_episode_observation = []
+            self.current_episode_actions = []
             self.env.render(mode="rgb_array")
             print("Env was reset. Took {} seconds to reset it.".format(
                 time.time() - start_time), flush=True)
@@ -199,6 +201,7 @@ class SkillTrainer:
 
                 # Store the transition in memory
                 action = self.action_converter.convert_to_array(action)
+                self.current_episode_actions += action
                 action = np.array(action)
                 action = torch.from_numpy(action).to(self.device)
                 self.memory.push(state, action, next_state, reward)
@@ -220,6 +223,10 @@ class SkillTrainer:
                     img.save(self.args.IMAGE_CAPTURE_LOCATION + 'image' +
                              str(i_episode) + '_' + str(t) + '.png')
             print("Finished episode", flush=True)
+            torch.save({
+                'observations': self.current_episode_observation,
+                'actions': self.current_episode_actions
+            }, './data_out' + self.args.mission + '_' + str(i_episode) + '.pt')
             # Update the target network, copying all weights and biases in DQN
             if i_episode % self.TARGET_UPDATE == 0:
                 print("Updating target at episode " +
