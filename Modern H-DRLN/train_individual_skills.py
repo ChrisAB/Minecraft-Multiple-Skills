@@ -187,7 +187,7 @@ class SkillTrainer:
                 # Select and perform an action
                 action = self.select_action(state)
                 obs, reward, done, info = self.env.step(action)
-                self.current_episode_rewards += reward
+                self.current_episode_rewards += [reward]
                 reward = torch.tensor([reward], device=self.device)
 
                 # Observe new state
