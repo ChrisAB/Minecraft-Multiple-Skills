@@ -17,6 +17,7 @@ import re
 import numpy as np
 from collections import OrderedDict
 from utils.action_converter import ActionConverter
+from image_processors.basic_processor import BasicImageProcessor
 from configs import train_individual_skills_config
 import logging
 import missions
@@ -50,7 +51,7 @@ class SkillTrainer:
         self.target_net.eval()
         self.optimizer = torch.optim.RMSprop(self.policy_net.parameters())
         self.memory = ReplayMemory(self.args.REPLAY_MEMORY_SIZE)
-        self.grayscaler = torchvision.transforms.Grayscale()
+        self.image_processor = BasicImageProcessor()
 
         self.BATCH_SIZE = self.args.BATCH_SIZE
         self.GAMMA = self.args.GAMMA
@@ -144,9 +145,7 @@ class SkillTrainer:
     def preprocess_image(self, obs):
         obs = obs['pov']
         self.current_episode_observation += [obs]
-        obs = torchvision.transforms.functional.to_tensor(
-            np.flip(obs, axis=0).copy())
-        obs = obs.reshape(1, 3, 64, 64)
+        obs = self.image_processor(obs)
         return obs.to(self.device)
 
     def plot_durations(self):

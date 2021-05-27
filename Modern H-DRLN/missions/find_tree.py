@@ -14,7 +14,7 @@ class NavigateTree(SimpleEmbodimentEnvSpec):
         name = 'MineRLNavigateTree-v0'
         self.dense = dense
         self.extreme = extreme
-        super().__init__(name, *args, max_episode_steps=6000, **kwargs)
+        super().__init__(name, *args, max_episode_steps=NAVIGATE_STEPS, **kwargs)
 
     def is_from_folder(self, folder: str) -> bool:
         return 'navigate'
