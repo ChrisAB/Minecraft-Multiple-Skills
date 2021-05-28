@@ -9,6 +9,44 @@ class CraftWoodenPickaxeActionConverter(ActionConverter):
         self.craft_actions = ['stick', 'planks', 'crafting_table']
         self.craft_nearby_actions = ['wooden_pickaxe']
 
+    def convert_to_array(self, actions):
+        actions_array = []
+        for key, value in actions.items():
+            if key == 'attack' or key == 'jump' or key == 'sneak' or key == 'sprint' or key == 'back' or key == 'forward' or key == 'left' or key == 'right':
+                actions_array += [value]
+            elif key == 'camera':
+                if(value[0] > 0):
+                    actions_array += [1, 0]
+                elif(value[0] < 0):
+                    actions_array += [0, 1]
+                else:
+                    actions_array += [0, 0]
+                if(value[1] > 0):
+                    actions_array += [1, 0]
+                elif(value[1] < 0):
+                    actions_array += [0, 1]
+                else:
+                    actions_array += [0, 0]
+            elif key == 'place':
+                for action in self.place_actions:
+                    if(action == value):
+                        actions_array += [1]
+                    else:
+                        actions_array += [0]
+            elif key == 'craft':
+                for action in self.craft_actions:
+                    if(action == value):
+                        actions_array += [1]
+                    else:
+                        actions_array += [0]
+            elif key == 'nearbycraft':
+                for action in self.craft_nearby_actions:
+                    if(action == value):
+                        actions_array += [1]
+                    else:
+                        actions_array += [0]
+        return actions_array
+
     def convert_to_ordereddict(self, actions_array):
         i = 0
         my_dict = copy.deepcopy(self.actions)
