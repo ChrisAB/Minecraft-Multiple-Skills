@@ -58,5 +58,4 @@ class CraftWoodenPickaxeActionConverter(ActionConverter):
                         break
                     else:
                         i += 1
-
         return my_dict
