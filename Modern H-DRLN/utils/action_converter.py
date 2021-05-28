@@ -47,9 +47,9 @@ class ActionConverter:
                     my_dict[key][0] = 0
                 i += 2
                 if(actions_array[i] == 1):
-                    my_dict[key][1] = 90
+                    my_dict[key][1] = 25
                 elif(actions_array[i+1] == 1):
-                    my_dict[key][1] = -90
+                    my_dict[key][1] = -25
                 else:
                     my_dict[key][1] = 0
                 i += 2
