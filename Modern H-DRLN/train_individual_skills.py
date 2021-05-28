@@ -51,7 +51,7 @@ class SkillTrainer:
         self.target_net.eval()
         self.optimizer = torch.optim.RMSprop(self.policy_net.parameters())
         self.memory = ReplayMemory(self.args.REPLAY_MEMORY_SIZE)
-        self.image_processor = BasicImageProcessor()
+        self.image_processor = BasicImageProcessor(args)
 
         self.BATCH_SIZE = self.args.BATCH_SIZE
         self.GAMMA = self.args.GAMMA
@@ -145,7 +145,7 @@ class SkillTrainer:
     def preprocess_image(self, obs):
         obs = obs['pov']
         self.current_episode_observation += [obs]
-        obs = self.image_processor(obs)
+        obs = self.image_processor.transform(obs)
         return obs.to(self.device)
 
     def plot_durations(self):
