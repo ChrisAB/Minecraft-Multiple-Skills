@@ -4,11 +4,11 @@ import copy
 
 class CraftWoodenPickaxeActionConverter:
     def __init__(self, actions):
-        self.actions = actions
-        self.actions_array = self.convert_to_array(actions)
         self.place_actions = ['crafting_table']
         self.craft_actions = ['stick', 'planks', 'crafting_table']
         self.craft_nearby_actions = ['wooden_pickaxe']
+        self.actions = actions
+        self.actions_array = self.convert_to_array(actions)
 
     def convert_to_array(self, actions):
         actions_array = []
@@ -40,7 +40,7 @@ class CraftWoodenPickaxeActionConverter:
                         actions_array += [1]
                     else:
                         actions_array += [0]
-            elif key == 'nearbycraft':
+            elif key == 'nearbyCraft':
                 for action in self.craft_nearby_actions:
                     if(action == value):
                         actions_array += [1]
@@ -88,7 +88,7 @@ class CraftWoodenPickaxeActionConverter:
                         break
                     else:
                         i += 1
-            elif key == 'nearbycraft':
+            elif key == 'nearbyCraft':
                 my_dict[key] = 'none'
                 for action in self.nearby_craft_actions:
                     if(actions_array[i] == 1):
