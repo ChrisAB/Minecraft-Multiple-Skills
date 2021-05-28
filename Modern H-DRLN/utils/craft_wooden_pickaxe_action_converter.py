@@ -2,9 +2,10 @@ from .action_converter import ActionConverter
 import copy
 
 
-class CraftWoodenPickaxeActionConverter(ActionConverter):
+class CraftWoodenPickaxeActionConverter:
     def __init__(self, actions):
-        super().__init__(actions)
+        self.actions = actions
+        self.actions_array = self.convert_to_array(actions)
         self.place_actions = ['crafting_table']
         self.craft_actions = ['stick', 'planks', 'crafting_table']
         self.craft_nearby_actions = ['wooden_pickaxe']
