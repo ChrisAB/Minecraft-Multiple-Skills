@@ -1,0 +1,8 @@
+2021-10-17 20:27:41 chrisab-Lenovo-ideapad-330-15IKB process_watcher[390870] INFO Process watcher started between parent 390805 and child 390837 
+2021-10-17 20:28:03 chrisab-Lenovo-ideapad-330-15IKB process_watcher[390870] INFO Parent is not running, hence we need terminate the child.
+2021-10-17 20:28:03 chrisab-Lenovo-ideapad-330-15IKB process_watcher[390870] INFO About to reap process tree of 390837:launchClient.sh:/usr/bin/bash i sleeping, owner 2490, printing process tree status in termination order:
+2021-10-17 20:28:03 chrisab-Lenovo-ideapad-330-15IKB process_watcher[390870] INFO 	-390841:java:/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java i sleeping, owner 390837
+2021-10-17 20:28:03 chrisab-Lenovo-ideapad-330-15IKB process_watcher[390870] INFO 	-390837:launchClient.sh:/usr/bin/bash i sleeping, owner 2490
+2021-10-17 20:28:03 chrisab-Lenovo-ideapad-330-15IKB process_watcher[390870] INFO Trying to SIGTERM 390841:java:/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java i sleeping, owner 390837
+2021-10-17 20:28:03 chrisab-Lenovo-ideapad-330-15IKB process_watcher[390870] INFO Process psutil.Process(pid=390841, name='java', status='terminated', started='20:27:39') terminated with exit code None
+2021-10-17 20:28:03 chrisab-Lenovo-ideapad-330-15IKB process_watcher[390870] INFO Process psutil.Process(pid=390837, name='launchClient.sh', status='terminated', started='20:27:39') does not exist or is zombie.

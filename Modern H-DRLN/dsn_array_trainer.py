@@ -33,7 +33,7 @@ from configs import train_individual_skills_config
 logging.basicConfig(level=logging.ERROR)
 
 
-class SkillTrainer:
+class DSNArrayModuleSkillTrainer:
     def __init__(self, args):
         self.loaded = False
         self.args = args
@@ -49,22 +49,47 @@ class SkillTrainer:
         self.init_hyper_parameters()
         self.init_episode()
 
-    def load_policy_module(self):
-        if(self.loaded and self.loaded.policy_module):
-            self.policy_net = self.loaded.policy_module
-        else:
-            print("Could not find policy_module saved in checkpoint. Using a new dsn array module initialized with array of DSNs")
-            self.policy_net = DQN(
-                input_dimensions=self.args.INPUT_DIMENSIONS, number_of_actions=self.n_actions).to(self.device)
+    # Load the DSNs which we train from
 
-    def load_target_module(self):
-        if(self.loaded and self.loaded.target_module):
-            self.target_net = self.loaded.target_module
+    def load_dsn_array(self):
+        self.array_of_DSNs = []
+        self.DSN_saves = []
+
+        for DSN_location in self.args.ARRAY_OF_DSN_LOCATIONS:
+            current_save = torch.load(DSN_location)
+            self.array_of_DSNs.append(current_save.module)
+            # if(current_save.nn_type == 'DQN'):
+
+            #     dqn = DQN(current_save.input_dimensions, current_save.inputs, current_save.filters,
+            #               current_save.strides, current_save.number_of_hidden_neurons, current_save.number_of_actions, current_save.nl)
+            #     self.array_of_DSN.append(DQN(current_save.nn))
+            # if(current_save.nn_type == 'DSNArrayModule'):
+            #     self.array_of_DSN.append(
+            #         DSNArrayModule(current_save.nn, QNetwork(), ControlBlock()))
+            self.DSN_saves.append(current_save)
+
+    def load_q_network(self):
+        if(self.loaded and self.loaded.q_network):
+            self.q_network = self.loaded.q_network
         else:
-            print("Could not find target_module saved in checkpoint. Using a new dsn array module initialized with array of DSNs")
-            self.target_net = DQN(
-                input_dimensions=self.args.INPUT_DIMENSIONS, number_of_actions=self.n_actions).to(self.device)
-            self.target_net.load_state_dict(self.policy_net.state_dict())
+            print("Could not find q_network saved in checkpoint. Using a new basic one")
+            self.q_network = QNetwork(
+                self.args.INPUT_DIMENSIONS[0]*self.args.INPUT_DIMENSIONS[1], self.args.INPUT_DIMENSIONS[2])
+
+    def load_control_block(self):
+        if(self.loaded and self.loaded.control_block):
+            self.control_block = self.loaded.control_block
+        else:
+            print(
+                "Could not find control_block saved in checkpoint. Using a new basic one")
+            self.control_block = ControlBlock()
+
+    def load_dsn_module(self):
+        if(self.loaded and self.loaded.module):
+            self.dsn = self.loaded.module
+        else:
+            print("Could not find module saved in checkpoint. Using a new dsn array module initialized with array of DSNs")
+            self.dsn = DSNArrayModule(self.array_of_DSNs)
 
     def load_checkpoint(self):
         try:
@@ -83,14 +108,19 @@ class SkillTrainer:
 
     def init_network_to_be_trained(self):
 
+        self.load_dsn_array()
+
         if(self.args.episode != 0):
             self.load_checkpoint()
 
-        self.load_policy_module()
-        self.load_target_module()
+        self.load_q_network()
+        self.load_control_block()
+        self.load_dsn_module()
+
+        self.dsn = DSNModule(self.dsn, self.q_network, self.control_block)
 
     def init_optimizer(self):
-        self.optimizer = torch.optim.Adam(self.policy_net.parameters())
+        self.optimizer = torch.optim.RMSprop(self.dsn.parameters())
 
     def init_replay_memory(self):
         self.memory = ReplayMemory(self.args.REPLAY_MEMORY_SIZE)
@@ -124,7 +154,7 @@ class SkillTrainer:
             math.exp(-1. * self.steps_done / self.EPS_DECAY)
 
     def get_prediction(self, state):
-        return self.policy_net(state)
+        return self.dsn(state)
 
     def select_action_using_epsilon_greedy(self, state):
         sample = random.random()
@@ -137,11 +167,10 @@ class SkillTrainer:
                 # second column on max result is index of where max element was
                 # found, so we pick action with the larger expected reward.
                 prediction = self.get_prediction(state)
-                return self.action_converter.get_action(prediction[0])
+                best_prediction = prediction.max(1)[1]
+                return self.action_converter.get_action(best_prediction)
         else:
-            rand_tensor = torch.rand(self.n_actions)
-            rand_tensor = torch.softmax(rand_tensor, 0)
-            return self.action_converter.get_action(rand_tensor)
+            return self.env.action_space.sample()
 
     def select_action(self, state):
         return self.select_action_using_epsilon_greedy(state)
@@ -168,8 +197,6 @@ class SkillTrainer:
         # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
         # columns of actions taken. These are the actions which would've been taken
         # for each batch state according to policy_net
-
-        action_batch = action_batch.type(torch.int64)
         state_action_values = self.policy_net(
             state_batch)
         state_action_values = state_action_values.gather(0, action_batch)
@@ -188,7 +215,7 @@ class SkillTrainer:
 
         # Compute Huber loss
         loss = torch.nn.functional.smooth_l1_loss(state_action_values,
-                                                  expected_state_action_values.unsqueeze(self.n_actions))
+                                                  expected_state_action_values.unsqueeze(1))
 
         # Optimize the model
         self.optimizer.zero_grad()
@@ -255,14 +282,14 @@ class SkillTrainer:
             out.release()
 
     def store_current_state_in_replay_memory(self):
-
-        self.memory.push(
-            self.obs, torch.from_numpy(self.action_converter.current_action_array), self.next_obs, self.reward)
+        self.action = np.array(self.action)
+        self.action = torch.from_numpy(self.action).to(self.device)
+        self.memory.push(self.obs, self.action, self.next_obs, self.reward)
 
     def save_current_image(self, episode, frame):
         if self.args.saveimagesteps > 0 and frame % self.args.saveimagesteps == 0 and frame != 0:
             print('Saved image ' + str(episode) +
-                  '_' + str(frame) + '.png', flush=True)
+                  '_' + str(t) + '.png', flush=True)
             img_obs = self.obs['pov']
             img_obs = np.flipud(img_obs)
             img = Image.fromarray(img_obs)
@@ -270,11 +297,10 @@ class SkillTrainer:
                      str(episode) + '_' + str(frame) + '.png')
 
     def save_checkpoint(self, episode):
-        torch.save({'target_module': self.target_net,
-                    'policy_module': self.policy_net,
-                    'steps_done': self.steps_done,
-                    'episode_durations': self.episode_durations},
-                   self.args.CHECKPOINT_SAVE_LOCATION + self.args.mission + '_' + str(episode) + '.pt')
+        torch.save({'steps_done': self.steps_done,
+                    'episode_durations': self.episode_durations,
+                    'nn': self.policy_net.state_dict()},
+                   self.args.CHECKPOINT_SAVE_LOCATION + self.args.mission + '_' + str(i_episode) + '.pt')
 
     def end_of_episode_processing(self, episode):
         self.plot_durations()
@@ -296,8 +322,8 @@ class SkillTrainer:
                 self.next_obs = None
                 self.save_episode(episode)
 
-            self.current_episode_actions += [
-                self.action_converter.current_action_array]
+            self.action = self.action_converter.convert_to_array(self.action)
+            self.current_episode_actions += [self.action]
 
             self.store_current_state_in_replay_memory()
 
@@ -383,5 +409,5 @@ if __name__ == '__main__':
     if args.server2 is None:
         args.server2 = args.server
 
-    trainer = SkillTrainer(args)
+    trainer = DSNArrayModuleSkillTrainer(args)
     trainer.start()

@@ -1,0 +1,26 @@
+[20:18:11] [EnvServerSocketHandler/INFO]: [STDOUT]: Received from localhost:<MissionInit xmlns="http://ProjectMalmo.microsoft.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SchemaVersion="" PlatformVersion="0.37.0"><Mission><About><Summary>MineRLNavigateTree-v0</Summary></About><ModSettings><MsPerTick>50</MsPerTick></ModSettings><ServerSection><ServerInitialConditions><Time><StartTime>6000</StartTime><AllowPassageOfTime>false</AllowPassageOfTime></Time><Weather>clear</Weather><AllowSpawning>false</AllowSpawning></ServerInitialConditions><ServerHandlers><DefaultWorldGenerator forceReset="true" generatorOptions="{}"/><NavigationDecorator><randomPlacementProperties><maxRandomizedRadius>64</maxRandomizedRadius><minRandomizedRadius>64</minRandomizedRadius><maxRadius>8</maxRadius><minRadius>0</minRadius><block>log</block><placement>surface</placement></randomPlacementProperties><minRandomizedDistance>0</minRandomizedDistance><maxRandomizedDistance>8</maxRandomizedDistance><randomizeCompassLocation>true</randomizeCompassLocation></NavigationDecorator><ServerQuitFromTimeUp timeLimitMs="300000" description="out_of_time"/><ServerQuitWhenAnyAgentFinishes/></ServerHandlers></ServerSection><AgentSection mode="Survival"><Name>MineRLAgent0</Name><AgentStart><Inventory><InventoryObject slot="0" type="compass" metadata="0" quantity="1"/></Inventory></AgentStart><AgentHandlers><FileBasedPerformanceProducer/><ObservationFromDamage/><PauseCommand/><VideoProducer want_depth="false"><Width>64</Width><Height>64</Height></VideoProducer><ObservationFromCompass/><ObservationFromFullInventory flat="false"/><HumanLevelCommands/><CameraCommands/><PlaceCommands/><RewardForTouchingBlockType><Block reward="100.0" type="log" behaviour="onceOnly"/></RewardForTouchingBlockType><AgentQuitFromTouchingBlockType><Block type="log"/></AgentQuitFromTouchingBlockType></AgentHandlers></AgentSection></Mission><ExperimentUID>e6fa85ec-a112-41a3-be68-4175dcbfb4a0</ExperimentUID><ClientRole>0</ClientRole><ClientAgentConnection><ClientIPAddress>127.0.0.1</ClientIPAddress><ClientMissionControlPort>0</ClientMissionControlPort><ClientCommandsPort>0</ClientCommandsPort><AgentIPAddress>127.0.0.1</AgentIPAddress><AgentMissionControlPort>0</AgentMissionControlPort><AgentVideoPort>0</AgentVideoPort><AgentDepthPort>0</AgentDepthPort><AgentLuminancePort>0</AgentLuminancePort><AgentObservationsPort>0</AgentObservationsPort><AgentRewardsPort>0</AgentRewardsPort><AgentColourMapPort>0</AgentColourMapPort></ClientAgentConnection></MissionInit>
+[20:18:12] [Realms Notification Availability checker #1/INFO]: Could not authorize you against Realms server: Invalid session id
+[20:18:12] [EnvServerSocketHandler/INFO]: [STDOUT]: REPLYING WITH: MALMOOK
+[20:18:12] [Client thread/INFO]: [STDOUT]: Mission received: MineRLNavigateTree-v0
+[20:18:12] [Client thread/INFO]: [STDOUT]: CLIENT request state: CREATING_HANDLERS
+[20:18:12] [Client thread/INFO]: [STDOUT]: CLIENT enter state: CREATING_HANDLERS
+[20:18:12] [Client thread/INFO]: [STDOUT]: Starting command server.
+[20:18:12] [Thread-11/INFO]: [STDOUT]: INFO: ->com(0) Listening for messages on port 10914
+[20:18:12] [Client thread/INFO]: [STDOUT]: CLIENT request state: EVALUATING_WORLD_REQUIREMENTS
+[20:18:12] [Client thread/INFO]: [STDOUT]: CLIENT enter state: EVALUATING_WORLD_REQUIREMENTS
+[20:18:12] [Client thread/INFO]: [STDOUT]: CLIENT request state: CREATING_NEW_WORLD
+[20:18:12] [Client thread/INFO]: [STDOUT]: CLIENT enter state: CREATING_NEW_WORLD
+[20:18:12] [Client thread/INFO]: [STDOUT]: [LOGTOPY] GENERATOR OPTIONS = {}
+[20:18:13] [Server thread/INFO]: Starting integrated minecraft server version 1.11.2
+[20:18:13] [Server thread/INFO]: Generating keypair
+[20:18:13] [Server thread/INFO]: Injecting existing block and item data into this server instance
+[20:18:13] [Server thread/INFO]: Applying holder lookups
+[20:18:13] [Server thread/INFO]: Holder lookups applied
+[20:18:13] [Server thread/INFO]: Loading dimension 0 (TEMP_0_fb7c5f84-1cca-4dd0-831b-6d73722f7edb) (net.minecraft.server.integrated.IntegratedServer@662aa2fd)
+[20:18:14] [Server thread/INFO]: Loading dimension 1 (TEMP_0_fb7c5f84-1cca-4dd0-831b-6d73722f7edb) (net.minecraft.server.integrated.IntegratedServer@662aa2fd)
+[20:18:14] [Server thread/INFO]: Loading dimension -1 (TEMP_0_fb7c5f84-1cca-4dd0-831b-6d73722f7edb) (net.minecraft.server.integrated.IntegratedServer@662aa2fd)
+[20:18:14] [Server thread/INFO]: Preparing start region for level 0
+[20:18:15] [Server thread/INFO]: Preparing spawn area: 7%
+[20:18:16] [Server thread/INFO]: Preparing spawn area: 17%
+[20:18:17] [Server thread/INFO]: Preparing spawn area: 30%
+[20:18:18] [Server thread/INFO]: Preparing spawn area: 46%

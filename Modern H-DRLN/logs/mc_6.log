@@ -1,0 +1,71 @@
+[20:00:49] [EnvServerSocketHandler/INFO]: [STDOUT]: Received from localhost:<MissionInit xmlns="http://ProjectMalmo.microsoft.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SchemaVersion="" PlatformVersion="0.37.0"><Mission><About><Summary>MineRLNavigateTree-v0</Summary></About><ModSettings><MsPerTick>50</MsPerTick></ModSettings><ServerSection><ServerInitialConditions><Time><StartTime>6000</StartTime><AllowPassageOfTime>false</AllowPassageOfTime></Time><Weather>clear</Weather><AllowSpawning>false</AllowSpawning></ServerInitialConditions><ServerHandlers><DefaultWorldGenerator forceReset="true" generatorOptions="{}"/><NavigationDecorator><randomPlacementProperties><maxRandomizedRadius>64</maxRandomizedRadius><minRandomizedRadius>64</minRandomizedRadius><maxRadius>8</maxRadius><minRadius>0</minRadius><block>log</block><placement>surface</placement></randomPlacementProperties><minRandomizedDistance>0</minRandomizedDistance><maxRandomizedDistance>8</maxRandomizedDistance><randomizeCompassLocation>true</randomizeCompassLocation></NavigationDecorator><ServerQuitFromTimeUp timeLimitMs="300000" description="out_of_time"/><ServerQuitWhenAnyAgentFinishes/></ServerHandlers></ServerSection><AgentSection mode="Survival"><Name>MineRLAgent0</Name><AgentStart><Inventory><InventoryObject slot="0" type="compass" metadata="0" quantity="1"/></Inventory></AgentStart><AgentHandlers><FileBasedPerformanceProducer/><ObservationFromDamage/><PauseCommand/><VideoProducer want_depth="false"><Width>64</Width><Height>64</Height></VideoProducer><ObservationFromCompass/><ObservationFromFullInventory flat="false"/><HumanLevelCommands/><CameraCommands/><PlaceCommands/><RewardForTouchingBlockType><Block reward="100.0" type="log" behaviour="onceOnly"/></RewardForTouchingBlockType><AgentQuitFromTouchingBlockType><Block type="log"/></AgentQuitFromTouchingBlockType></AgentHandlers></AgentSection></Mission><ExperimentUID>8aee059d-5e23-4901-b827-a4132027a919</ExperimentUID><ClientRole>0</ClientRole><ClientAgentConnection><ClientIPAddress>127.0.0.1</ClientIPAddress><ClientMissionControlPort>0</ClientMissionControlPort><ClientCommandsPort>0</ClientCommandsPort><AgentIPAddress>127.0.0.1</AgentIPAddress><AgentMissionControlPort>0</AgentMissionControlPort><AgentVideoPort>0</AgentVideoPort><AgentDepthPort>0</AgentDepthPort><AgentLuminancePort>0</AgentLuminancePort><AgentObservationsPort>0</AgentObservationsPort><AgentRewardsPort>0</AgentRewardsPort><AgentColourMapPort>0</AgentColourMapPort></ClientAgentConnection></MissionInit>
+[20:00:50] [Realms Notification Availability checker #1/INFO]: Could not authorize you against Realms server: Invalid session id
+[20:00:50] [EnvServerSocketHandler/INFO]: [STDOUT]: REPLYING WITH: MALMOOK
+[20:00:50] [Client thread/INFO]: [STDOUT]: Mission received: MineRLNavigateTree-v0
+[20:00:50] [Client thread/INFO]: [STDOUT]: CLIENT request state: CREATING_HANDLERS
+[20:00:50] [Client thread/INFO]: [STDOUT]: CLIENT enter state: CREATING_HANDLERS
+[20:00:50] [Client thread/INFO]: [STDOUT]: Starting command server.
+[20:00:50] [Thread-11/INFO]: [STDOUT]: INFO: ->com(0) Listening for messages on port 10937
+[20:00:50] [Client thread/INFO]: [STDOUT]: CLIENT request state: EVALUATING_WORLD_REQUIREMENTS
+[20:00:50] [Client thread/INFO]: [STDOUT]: CLIENT enter state: EVALUATING_WORLD_REQUIREMENTS
+[20:00:50] [Client thread/INFO]: [STDOUT]: CLIENT request state: CREATING_NEW_WORLD
+[20:00:50] [Client thread/INFO]: [STDOUT]: CLIENT enter state: CREATING_NEW_WORLD
+[20:00:50] [Client thread/INFO]: [STDOUT]: [LOGTOPY] GENERATOR OPTIONS = {}
+[20:00:51] [Server thread/INFO]: Starting integrated minecraft server version 1.11.2
+[20:00:51] [Server thread/INFO]: Generating keypair
+[20:00:51] [Server thread/INFO]: Injecting existing block and item data into this server instance
+[20:00:51] [Server thread/INFO]: Applying holder lookups
+[20:00:51] [Server thread/INFO]: Holder lookups applied
+[20:00:51] [Server thread/INFO]: Loading dimension 0 (TEMP_0_10deb7aa-d058-45ad-b4a6-7d527cff01b3) (net.minecraft.server.integrated.IntegratedServer@2ba39c9)
+[20:00:52] [Server thread/INFO]: Loading dimension 1 (TEMP_0_10deb7aa-d058-45ad-b4a6-7d527cff01b3) (net.minecraft.server.integrated.IntegratedServer@2ba39c9)
+[20:00:52] [Server thread/INFO]: Loading dimension -1 (TEMP_0_10deb7aa-d058-45ad-b4a6-7d527cff01b3) (net.minecraft.server.integrated.IntegratedServer@2ba39c9)
+[20:00:52] [Server thread/INFO]: Preparing start region for level 0
+[20:00:53] [Server thread/INFO]: Preparing spawn area: 12%
+[20:00:54] [Server thread/INFO]: Preparing spawn area: 24%
+[20:00:55] [Server thread/INFO]: Preparing spawn area: 39%
+[20:00:56] [Server thread/INFO]: Preparing spawn area: 53%
+[20:00:57] [Server thread/INFO]: Preparing spawn area: 69%
+[20:00:58] [Server thread/INFO]: Preparing spawn area: 85%
+[20:00:59] [Server thread/INFO]: Changing view distance to 4, from 10
+[20:00:59] [Netty Local Client IO #0/INFO]: [STDOUT]: Transformed Name: net.minecraft.client.entity.EntityOtherPlayerMP
+[20:00:59] [Netty Local Client IO #0/INFO]: [STDOUT]: MALMO: Found EntityOtherPlayerMP, attempting to transform it
+[20:00:59] [Server thread/INFO]: [STDOUT]: SERVER request state: WAITING_FOR_MOD_READY
+[20:00:59] [Server thread/INFO]: [STDOUT]: CLIENT request state: WAITING_FOR_SERVER_READY
+[20:01:00] [Server thread/INFO]: [STDOUT]: SERVER enter state: WAITING_FOR_MOD_READY
+[20:01:00] [Client thread/INFO]: [STDOUT]: CLIENT enter state: WAITING_FOR_SERVER_READY
+[20:01:00] [Netty Local Client IO #0/INFO]: Server protocol version 2
+[20:01:00] [Netty Server IO #1/INFO]: Client protocol version 2
+[20:01:00] [Netty Server IO #1/INFO]: Client attempting to join with 5 mods : minecraft@1.11.2,FML@8.0.99.99,malmomod@0.37.0,forge@13.20.1.2588,mcp@9.19
+[20:01:00] [Netty Local Client IO #0/INFO]: [Netty Local Client IO #0] Client side modded connection established
+[20:01:00] [Server thread/INFO]: [Server thread] Server side modded connection established
+[20:01:00] [Server thread/INFO]: MineRLAgent0[local:E:6071ef9a] logged in with entity id 679 at (-148.5, 68.0, 208.5)
+[20:01:00] [Server thread/INFO]: MineRLAgent0 joined the game
+[20:01:00] [Server thread/INFO]: [STDOUT]: SERVER request state: DORMANT
+[20:01:00] [Server thread/INFO]: [STDOUT]: SERVER enter state: DORMANT
+[20:01:00] [Server thread/INFO]: [STDOUT]: INCOMING MISSION: Received MissionInit directly through ServerStateMachine constructor.
+[20:01:00] [Server thread/INFO]: [STDOUT]: Mission received: MineRLNavigateTree-v0
+[20:01:00] [Server thread/INFO]: Received mission: §9MineRLNavigateTree-v0
+[20:01:00] [Server thread/INFO]: Source: §alocalhost
+[20:01:00] [Server thread/INFO]: [STDOUT]: SERVER request state: BUILDING_WORLD
+[20:01:00] [Server thread/INFO]: [STDOUT]: SERVER enter state: BUILDING_WORLD
+[20:01:00] [Server thread/INFO]: [STDOUT]: SERVER request state: WAITING_FOR_AGENTS_TO_ASSEMBLE
+[20:01:01] [Client thread/INFO]: [STDOUT]: ***Telling server we are ready - MineRLAgent0
+[20:01:01] [Server thread/INFO]: [STDOUT]: SERVER enter state: WAITING_FOR_AGENTS_TO_ASSEMBLE
+[20:01:01] [Server thread/INFO]: [STDOUT]: Experiment requires: 
+[20:01:01] [Server thread/INFO]: [STDOUT]: >>>> MineRLAgent0
+[20:01:01] [Client thread/INFO]: [CHAT] Received mission: §9MineRLNavigateTree-v0
+[20:01:01] [Client thread/INFO]: [CHAT] Source: §alocalhost
+[20:01:02] [Client thread/INFO]: [STDOUT]: ***Telling server we are ready - MineRLAgent0
+[20:01:02] [Server thread/INFO]: [STDOUT]: Initializing player with username MineRLAgent0 and agentname MineRLAgent0
+[20:01:02] [Client thread/INFO]: [STDOUT]: CLIENT request state: RUNNING
+[20:01:02] [Client thread/INFO]: [STDOUT]: CLIENT enter state: RUNNING
+[20:01:02] [Server thread/INFO]: [STDOUT]: SERVER request state: RUNNING
+[20:01:02] [Server thread/INFO]: [STDOUT]: SERVER enter state: RUNNING
+[20:01:02] [Client thread/INFO]: [STDOUT]: Preparing reward com.microsoft.Malmo.MissionHandlers.RewardForTouchingBlockTypeImplementation@124fe144 with agent name MineRLAgent0
+[20:01:02] [Client thread/INFO]: [STDOUT]: [LOGTOPY] On Mac OSX Catalina make sure to install this OpenJDK 1.8.0_152-release-1056-b12, this prevents the NSDragRegions crash
+[20:01:02] [Client thread/INFO]: [STDOUT]: Resized the window
+[20:01:02] [Client thread/INFO]: [STDOUT]: Unpausing
+[20:01:03] [Server thread/INFO]: [STDOUT]: Warning: managed 18/20 ticks this second.
+[20:01:04] [Server thread/INFO]: [STDOUT]: Warning: managed 18/20 ticks this second.
+[20:01:05] [Server thread/INFO]: [STDOUT]: Warning: managed 19/20 ticks this second.
+[20:01:10] [Server thread/INFO]: [STDOUT]: Warning: managed 6/20 ticks this second.

@@ -1,4 +1,4 @@
-from q_network import QNetwork
+from neural_networks.q_network import QNetwork
 import h5py
 import argparse
 import torch

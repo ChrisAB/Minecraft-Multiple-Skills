@@ -1,10 +1,16 @@
 import copy
+import math
+import torch
+import numpy as np
 
 
 class ActionConverter:
     def __init__(self, actions):
         self.actions = actions
         self.actions_array = self.convert_to_array(actions)
+        self.n_actions = len(self.actions_array)
+        self.current_action_array = []
+        self.current_action_tensor = None
 
     def convert_to_array(self, actions):
         actions_array = []
@@ -40,11 +46,13 @@ class ActionConverter:
                 i += 1
             elif key == 'camera':
                 if(actions_array[i] == 1):
-                    my_dict[key][0] = 90
+                    self.actions[key][0] = min(self.actions[key][0]+90, 180)
+                    my_dict[key][0] = self.actions[key][0]
                 elif(actions_array[i+1] == 1):
-                    my_dict[key][0] = -90
+                    self.actions[key][0] = max(self.actions[key][0]-90, -180)
+                    my_dict[key][0] = self.actions[key][0]
                 else:
-                    my_dict[key][0] = 0
+                    my_dict[key][0] = self.actions[key][0]
                 i += 2
                 if(actions_array[i] == 1):
                     my_dict[key][1] = 25
@@ -60,3 +68,10 @@ class ActionConverter:
                     my_dict[key] = 'dirt'
                 i += 1
         return my_dict
+
+    def get_action(self, action_tensor):
+        self.current_action_tensor = action_tensor
+        max_index = self.current_action_tensor.argmax()
+        self.current_action_array = np.zeros(self.n_actions)
+        self.current_action_array[max_index] = 1
+        return self.convert_to_ordereddict(self.current_action_array)
